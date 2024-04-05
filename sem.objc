@@ -1,0 +1,82 @@
+### Doctor.h:
+
+#import <Foundation/Foundation.h>
+
+// Объявление протокола делегата DoctorDelegate
+@protocol DoctorDelegate <NSObject>
+
+- (void)doctorPrescribeMedication; // Метод, вызываемый для выписывания лекарства
+
+@end
+
+@interface Doctor : NSObject
+
+@property (nonatomic, weak) id<DoctorDelegate> delegate; // Ссылка на делегата
+
+- (void)prescribeMedicationToPatient; // Метод для выписывания лекарства пациенту
+
+@end
+
+
+### Doctor.m:
+
+#import "Doctor.h"
+
+@implementation Doctor
+
+- (void)prescribeMedicationToPatient {
+    if ([self.delegate respondsToSelector:@selector(doctorPrescribeMedication)]) {
+        [self.delegate doctorPrescribeMedication];
+    }
+}
+
+@end
+
+
+### Patient.h:
+
+#import <Foundation/Foundation.h>
+#import "Doctor.h" // Импорт класса Doctor
+
+@interface Patient : NSObject <DoctorDelegate>
+
+- (void)takeMedication; // Метод для принятия лекарства
+
+@end
+
+
+### Patient.m:
+
+#import "Patient.h"
+
+@implementation Patient
+
+- (void)takeMedication {
+    NSLog(@"Пациент выпил пилюлю");
+}
+
+#pragma mark - DoctorDelegate
+
+- (void)doctorPrescribeMedication {
+    [self takeMedication];
+}
+
+@end
+
+### main.m:
+
+#import <Foundation/Foundation.h>
+#import "Doctor.h"
+#import "Patient.h"
+
+int main(int argc, const char * argv[]) {
+    @autoreleasepool {
+        Doctor *doctor = [[Doctor alloc] init];
+        Patient *patient = [[Patient alloc] init];
+        
+        doctor.delegate = patient; // Устанавливаем пациента в качестве делегата доктора
+        
+        [doctor prescribeMedicationToPatient]; // Доктор выписывает лекарство пациенту
+    }
+    return 0;
+}
